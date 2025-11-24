@@ -4,10 +4,9 @@ import api from '../lib/api';
 import { ListingCard } from '../components/ListingCard';
 import { useStore } from '../store/useStore';
 
-// 1. Define the interface for the grid items
 interface ListingSummary {
   id: string;
-  type: 'property' | 'project' | 'land'; // Union type for better safety
+  type: string;
   name: string;
   price: string;
   location: string;
@@ -15,7 +14,6 @@ interface ListingSummary {
 }
 
 export const LandingPage = () => {
-  // 2. Apply the interface to useState
   const [listings, setListings] = useState<ListingSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,7 +29,7 @@ export const LandingPage = () => {
         ? `/listings/search?q=${encodeURIComponent(query)}` 
         : '/listings/popular';
         
-      const { data } = await api.get<ListingSummary[]>(endpoint); // Typed response
+      const { data } = await api.get<ListingSummary[]>(endpoint);
       setListings(data);
     } catch (err) {
       console.error(err);
@@ -54,12 +52,12 @@ export const LandingPage = () => {
   return (
     <div className="pb-20">
       {/* Hero Section */}
-      <section className="bg-ohb-gray py-20 px-4 text-center border-b border-gray-200">
+      <section className="bg-ohb-gray dark:bg-slate-950 py-20 px-4 text-center border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
         <div className="max-w-4xl mx-auto space-y-6">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-ohb-dark tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-ohb-dark dark:text-white tracking-tight transition-colors">
             Unlock Your <span className="text-ohb-gold">Dream Home</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors">
             Find approved, perfect property with flexible options and expert guidance directly from Oman Housing Bank partners.
           </p>
 
@@ -68,14 +66,14 @@ export const LandingPage = () => {
             <input 
               type="text" 
               placeholder="Search by location, keywords..."
-              className="w-full pl-14 pr-4 py-5 rounded-full shadow-lg border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-ohb-gold transition text-lg"
+              className="w-full pl-14 pr-4 py-5 rounded-full shadow-lg border-0 ring-1 ring-gray-200 dark:ring-slate-700 focus:ring-2 focus:ring-ohb-gold bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-gray-400 transition-all text-lg"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={24} />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={24} />
             <button 
               type="submit" 
-              className="absolute right-3 top-2.5 bottom-2.5 bg-ohb-dark text-white px-8 rounded-full font-bold hover:bg-ohb-gold transition"
+              className="absolute right-3 top-2.5 bottom-2.5 bg-ohb-dark dark:bg-ohb-gold text-white px-8 rounded-full font-bold hover:bg-ohb-gold dark:hover:bg-white dark:hover:text-ohb-gold transition-colors"
             >
               Search
             </button>
@@ -83,16 +81,16 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Listings Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-ohb-dark border-l-4 border-ohb-gold pl-4">
+          <h2 className="text-2xl font-bold text-ohb-dark dark:text-white border-l-4 border-ohb-gold pl-4 transition-colors">
             {searchTerm ? `Results for "${searchTerm}"` : 'Most Popular Properties'}
           </h2>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-50 text-red-600 rounded-lg text-center mb-8">
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-center mb-8">
             {error}
           </div>
         )}
@@ -107,16 +105,11 @@ export const LandingPage = () => {
               listings.map((item) => (
                 <ListingCard 
                   key={item.id}
-                  id={item.id}
-                  type={item.type}
-                  name={item.name}
-                  price={item.price}
-                  location={item.location}
-                  image_urls={item.image_urls}
+                  {...item}
                 />
               ))
             ) : (
-              <div className="col-span-full text-center py-20 text-gray-500">
+              <div className="col-span-full text-center py-20 text-gray-500 dark:text-gray-400">
                 No properties found matching your criteria.
               </div>
             )}
