@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // <--- 1. Added Link here
 import api from '../lib/api';
 import { useStore } from '../store/useStore';
 
@@ -15,7 +15,9 @@ export const LoginPage = () => {
       const { data } = await api.post('/auth/login', { email, password });
       login(data.user, data.access_token);
       navigate('/');
-    } catch (err) { alert('Invalid credentials' + err); }
+    } catch (err) { 
+      alert('Invalid credentials' + err); 
+    }
   };
 
   return (
@@ -35,6 +37,15 @@ export const LoginPage = () => {
             Sign In
           </button>
         </form>
+
+        {/* --- 2. ADDED THIS SECTION --- */}
+        <div className="mt-6 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-ohb-gold font-bold hover:underline">
+            Create one
+          </Link>
+        </div>
+        
       </div>
     </div>
   );
