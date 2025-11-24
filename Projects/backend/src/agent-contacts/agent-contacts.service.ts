@@ -8,7 +8,7 @@ export class AgentContactsService {
 
   async create(userId: string, dto: CreateContactDto) {
     // We strictly use the userId from the token, not the body, for security.
-    return this.prisma.agent_contacts.create({
+    return (this.prisma as any).agent_contacts.create({
       data: {
         user_id: userId,
         listing_id: dto.listingId,

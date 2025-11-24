@@ -1,0 +1,21 @@
+1- Registration
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "architect@ohb.com", "password": "password123", "fullName": "Lead Architect"}'
+
+2- Login (Copy the token from response - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyY2hpdGVjdEBvaGIuY29tIiwic3ViIjoiMTU3OGQxYzItMzk0OS00MWZlLTk1MDUtYzYyYmIwYjNjNGYzIiwiaWF0IjoxNzYzOTk2MzA1LCJleHAiOjE3NjM5OTk5MDV9.hN1HbFcfT3ZIgK9UofNk3nl_v7jgLHlGE8P0Y70ntiA)
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "architect@ohb.com", "password": "password123"}'
+
+3- Popular Listings
+curl http://localhost:3000/listings/popular
+
+4- Search
+curl "http://localhost:3000/listings/search?q=villa"
+
+5- 
+curl -X POST http://localhost:3000/agent-contact \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyY2hpdGVjdEBvaGIuY29tIiwic3ViIjoiMTU3OGQxYzItMzk0OS00MWZlLTk1MDUtYzYyYmIwYjNjNGYzIiwiaWF0IjoxNzYzOTk2MzA1LCJleHAiOjE3NjM5OTk5MDV9.hN1HbFcfT3ZIgK9UofNk3nl_v7jgLHlGE8P0Y70ntiA" \
+  -d '{"listingId": "d632bc8d-253b-4d19-a2f3-ad9ea06ded93", "listingType": "property", "message": "I am interested!"}'

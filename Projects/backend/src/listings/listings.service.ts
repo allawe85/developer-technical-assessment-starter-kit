@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+
 @Injectable()
 export class ListingsService {
   constructor(private prisma: PrismaService) {}
@@ -9,7 +10,7 @@ export class ListingsService {
   async getPopular() {
     // We use $queryRaw because "popular_listings_view" is a SQL View, not a physical table 
     // mapped in schema.prisma.
-    const results = await this.prisma.$queryRaw`
+    const results = await (this.prisma as any).$queryRaw`
       SELECT * FROM popular_listings_view 
       ORDER BY popularity_score DESC, created_at DESC 
       LIMIT 6
@@ -30,9 +31,9 @@ export class ListingsService {
 
     // Parallel queries to all 3 tables using the indexed 'search_vector'
     const [props, projects, lands] = await Promise.all([
-        this.prisma.$queryRaw`SELECT id, name, price, location, image_urls, 'property' as type FROM properties WHERE search_vector @@ to_tsquery('english', ${term}) LIMIT 5`,
-        this.prisma.$queryRaw`SELECT id, name, price_range, location, image_urls, 'project' as type FROM projects WHERE search_vector @@ to_tsquery('english', ${term}) LIMIT 5`,
-        this.prisma.$queryRaw`SELECT id, name, price, location, image_urls, 'land' as type FROM lands WHERE search_vector @@ to_tsquery('english', ${term}) LIMIT 5`
+        (this.prisma as any).$queryRaw`SELECT id, name, price, location, image_urls, 'property' as type FROM properties WHERE search_vector @@ to_tsquery('english', ${term}) LIMIT 5`,
+        (this.prisma as any).$queryRaw`SELECT id, name, price_range, location, image_urls, 'project' as type FROM projects WHERE search_vector @@ to_tsquery('english', ${term}) LIMIT 5`,
+        (this.prisma as any).$queryRaw`SELECT id, name, price, location, image_urls, 'land' as type FROM lands WHERE search_vector @@ to_tsquery('english', ${term}) LIMIT 5`
     ]);
 
     const combined = [...(props as any[]), ...(projects as any[]), ...(lands as any[])];
@@ -46,13 +47,13 @@ export class ListingsService {
     // Switch based on type to query the correct table
     switch (type.toLowerCase()) {
       case 'property':
-        item = await this.prisma.properties.findUnique({ where: { id } });
+        item = await (this.prisma as any).properties.findUnique({ where: { id } });
         break;
       case 'project':
-        item = await this.prisma.projects.findUnique({ where: { id } });
+        item = await (this.prisma as any).projects.findUnique({ where: { id } });
         break;
       case 'land':
-        item = await this.prisma.lands.findUnique({ where: { id } });
+        item = await (this.prisma as any).lands.findUnique({ where: { id } });
         break;
       default:
         throw new NotFoundException('Invalid listing type');
@@ -66,10 +67,13 @@ export class ListingsService {
   private formatRawResults(results: any) {
     if (!Array.isArray(results)) return [];
     return results.map((row: any) => {
+
         // Handle BigInt serialization if necessary (Prisma returns Decimals/BigInts weirdly sometimes)
         // And fix the array format if it's a string
         return {
             ...row,
+            // FIX: Convert BigInt popularity_score to a standard number
+            popularity_score: row.popularity_score ? Number(row.popularity_score) : 0, 
             // Ensure prices are readable numbers/strings
             price: row.price ? row.price.toString() : row.price_range, 
             image_urls: Array.isArray(row.image_urls) ? row.image_urls : this.parsePostgresArray(row.image_urls)

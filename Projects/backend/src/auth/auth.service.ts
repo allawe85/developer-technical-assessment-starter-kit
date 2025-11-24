@@ -12,7 +12,7 @@ export class AuthService {
 
   async register(dto: any) {
     // Check if user exists
-    const existing = await this.prisma.users.findUnique({
+    const existing = await (this.prisma as any).users.findUnique({
       where: { email: dto.email },
     });
     if (existing) throw new ConflictException('User already exists');
@@ -21,7 +21,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     // Create user
-    const user = await this.prisma.users.create({
+    const user = await (this.prisma as any).users.create({
       data: {
         email: dto.email,
         password_hash: hashedPassword,
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async login(dto: any) {
-    const user = await this.prisma.users.findUnique({
+    const user = await (this.prisma as any).users.findUnique({
       where: { email: dto.email },
     });
 
