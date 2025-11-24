@@ -1,0 +1,1 @@
+SELECT * FROM popular_listings_view ORDER BY popularity_score DESC LIMIT 6;

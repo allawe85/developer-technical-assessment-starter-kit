@@ -100,9 +100,7 @@ This file should includes:
 1. Tables and Views creation
 2. Indexes
 
-before running the script, install postgres client
-apt-get update && apt-get install -y postgresql-client
-
-run the command below in database folder (Projects/database/) to setup the database
-psql -h db -U postgres -d postgres -f script.sql
-
+To create the random fake data navigate to backend folder in your terminal and Run: 
+```
+node seed.js
+```
