@@ -30,6 +30,8 @@ CREATE TABLE properties (
     details TEXT,
     sq_ft_or_area DECIMAL(10, 2),
     amenities TEXT[],
+    latitude DECIMAL(10, 6),  
+    longitude DECIMAL(10, 6), 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     
     -- Generated column for full-text search optimization
@@ -49,6 +51,8 @@ CREATE TABLE projects (
     details TEXT,
     sq_ft_or_area DECIMAL(10, 2),
     completion_date DATE,
+    latitude DECIMAL(10, 6),  
+    longitude DECIMAL(10, 6), 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     search_vector tsvector GENERATED ALWAYS AS (
@@ -67,6 +71,8 @@ CREATE TABLE lands (
     details TEXT,
     sq_ft_or_area DECIMAL(10, 2),
     zoning_type VARCHAR(100),
+    latitude DECIMAL(10, 6),  
+    longitude DECIMAL(10, 6), 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     search_vector tsvector GENERATED ALWAYS AS (
@@ -108,6 +114,8 @@ CREATE OR REPLACE VIEW popular_listings_view AS
         l.price::text as price_display, 
         l.location, 
         l.image_urls, 
+        l.latitude, 
+        l.longitude, 
         'property' as type, 
         l.created_at,
         (SELECT COUNT(*) FROM agent_contacts ac WHERE ac.listing_id = l.id) as popularity_score
@@ -119,6 +127,8 @@ CREATE OR REPLACE VIEW popular_listings_view AS
         p.price_range as price_display, 
         p.location, 
         p.image_urls, 
+        p.latitude, 
+        p.longitude, 
         'project' as type, 
         p.created_at,
         (SELECT COUNT(*) FROM agent_contacts ac WHERE ac.listing_id = p.id) as popularity_score
@@ -130,6 +140,8 @@ CREATE OR REPLACE VIEW popular_listings_view AS
         la.price::text as price_display, 
         la.location, 
         la.image_urls, 
+        la.latitude, 
+        la.longitude, 
         'land' as type, 
         la.created_at,
         (SELECT COUNT(*) FROM agent_contacts ac WHERE ac.listing_id = la.id) as popularity_score

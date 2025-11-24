@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { Navbar } from './components/Navbar';
 import { useStore } from './store/useStore';
+import { MapPage } from './pages/MapPage';
 
 function App() {
   // 1. Get the dark mode state
@@ -29,6 +30,7 @@ function App() {
           <Route path="/details/:type/:id" element={<DetailsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/map" element={<MapPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

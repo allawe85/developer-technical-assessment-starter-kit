@@ -49,7 +49,7 @@ This project includes a fully configured `.devcontainer` specification.
     # Or: in terminal navigate to database folder and run: psql -h db -U postgres -d postgres -f script.sql 
     
     # 3. Seed the Database (1000+ Records for Performance Test)
-    Navigate to backend folder and run: npm run seed.js
+    Navigate to backend folder and run: node seed.js
     
     # 4. Start Server
     npm run start:dev
@@ -76,3 +76,4 @@ npm run test:cov
 
 ## Implemented Extra Features
 1- Dark Theme
+2- Map Page (Bottom Up Implementation of DB, Backend and Frontend)

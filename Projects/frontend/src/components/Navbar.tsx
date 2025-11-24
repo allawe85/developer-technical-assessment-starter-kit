@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, User, LogOut, Moon, Sun } from 'lucide-react';
+import { Home, User, LogOut, Moon, Sun, Map as MapIcon } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const Navbar = () => {
@@ -16,8 +16,8 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="bg-ohb-gold p-2 rounded text-white">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="bg-ohb-gold p-2 rounded text-white group-hover:scale-105 transition-transform">
               <Home size={24} />
             </div>
             <div className="flex flex-col">
@@ -31,16 +31,21 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+          <div className="hidden md:flex space-x-8 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors items-center">
             <Link to="/" className="hover:text-ohb-gold dark:hover:text-ohb-gold transition">Search</Link>
+            
+            {/* NEW MAP LINK */}
+            <Link to="/map" className="flex items-center gap-1 hover:text-ohb-gold dark:hover:text-ohb-gold transition text-ohb-gold dark:text-ohb-gold font-semibold">
+              <MapIcon size={16} />
+              Map View
+            </Link>
+
             <a href="#" className="hover:text-ohb-gold dark:hover:text-ohb-gold transition">Processes</a>
             <a href="#" className="hover:text-ohb-gold dark:hover:text-ohb-gold transition">Help</a>
-            <a href="#" className="hover:text-ohb-gold dark:hover:text-ohb-gold transition">Properties</a>
           </div>
 
           {/* Right Actions: Theme Toggle + Auth */}
           <div className="flex items-center gap-4">
-            {/* Dark Mode Toggle */}
             <button 
               onClick={toggleTheme} 
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-yellow-400 transition-colors"
@@ -49,14 +54,12 @@ export const Navbar = () => {
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
-            {/* Divider */}
             <div className="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
 
-            {/* Auth Logic */}
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">
-                  Hello, {user.name}
+                  Hello, {user.name.split(' ')[0]}
                 </span>
                 <button 
                   onClick={handleLogout}

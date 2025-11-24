@@ -11,6 +11,12 @@ export class ListingsController {
     return this.listingsService.getPopular();
   }
 
+  // ENDPOINT: GET /listings/map
+  @Get('map')
+  getMapListings() {
+    return this.listingsService.getMapListings();
+  }
+
   // Endpoint: GET /listings/search?q=villa
   @Get('search')
   search(@Query('q') q: string) {

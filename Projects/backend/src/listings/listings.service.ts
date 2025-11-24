@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ListingsService {
   constructor(private prisma: PrismaService) {}
 
-  // 1. Fetch Popular Listings (Hits the SQL View)
+  // Fetch Popular Listings (Hits the SQL View)
   async getPopular() {
     // We use $queryRaw because "popular_listings_view" is a SQL View, not a physical table 
     // mapped in schema.prisma.
@@ -19,8 +19,17 @@ export class ListingsService {
     // Parse the image_urls (Postgres returns them as a string like "{url1,url2}" in raw queries)
     return this.formatRawResults(results);
   }
+    // NEW: Map Listings (Top 50 with Coordinates)
+  async getMapListings() {
+    const results = await (this.prisma as any).$queryRaw`
+      SELECT * FROM popular_listings_view 
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+      ORDER BY popularity_score DESC, created_at DESC 
+      LIMIT 50
+    `;
+    return this.formatRawResults(results);
+  }
 
-  // 2. Search (Task 3 "Hard" Requirement)
   // Uses the Full-Text Search Index (GIN) we created
   async search(keyword: string) {
     // If keyword is empty, return popular
@@ -69,14 +78,14 @@ export class ListingsService {
     return results.map((row: any) => {
 
         // Handle BigInt serialization if necessary (Prisma returns Decimals/BigInts weirdly sometimes)
-        // And fix the array format if it's a string
         return {
             ...row,
             // FIX: Convert BigInt popularity_score to a standard number
             popularity_score: row.popularity_score ? Number(row.popularity_score) : 0, 
-            // Ensure prices are readable numbers/strings
             price: row.price ? row.price.toString() : row.price_range, 
-            image_urls: Array.isArray(row.image_urls) ? row.image_urls : this.parsePostgresArray(row.image_urls)
+            image_urls: Array.isArray(row.image_urls) ? row.image_urls : this.parsePostgresArray(row.image_urls),
+            latitude: row.latitude ? Number(row.latitude) : null,
+            longitude: row.longitude ? Number(row.longitude) : null
         };
     });
   }
