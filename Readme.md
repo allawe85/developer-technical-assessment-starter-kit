@@ -1,106 +1,75 @@
-# Real Estate Platform – Technical Assessment
+# OHB Real Estate Marketplace - Technical Assessment
 
-This repository contains my solution for the **Oman Housing Bank – Developer Technical Assessment**.  
-The project is a full-stack Real Estate landing page and property details view built with:
+A high-performance, full-stack real estate platform featuring dynamic search, polymorphic listings (Properties, Projects, Lands), and secure lead generation.
 
-- **Frontend:** React + TypeScript  
-- **Backend:** NestJS + TypeScript  
-- **Database:** PostgreSQL  
-- **Containerization / Dev Env:** VS Code Dev Container + Docker
+## Tech Stack
 
----
-
-## 1. Repository Structure
-
-```text
-.
-├── .devcontainer/
-│   ├── devcontainer.json        # VS Code Dev Container configuration
-│   ├── docker-compose.yml       # Postgres service and dev container config
-│   └── Dockerfile               # Image used by the Dev Container
-├── .vscode/
-│   └── settings.json
-├── Projects/
-│   ├── backend/                 # NestJS backend API project
-│   ├── frontend/                # React frontend project
-│   └── database/
-│       └── script.sql           # DB schema, indexes, seed data
-├── sample data/
-│   └── images/
-│       ├── lands/
-│       │   ├── land1.jpg
-│       │   └── land2.jpg
-│       ├── projects/
-│       │   ├── project1.jpg
-│       │   └── project2.jpg
-│       └── properties/
-│           ├── property1.jpg
-│           └── property2.jpg
-└── README.md
-```
-
-**Put each component in these folders:**
-- Backend project → `Projects/backend`
-- Frontend project → `Projects/frontend`
-- Database scripts → `Projects/database/script.sql`
-- Sample images → `sample data/images/...`
+- **Backend:** NestJS (Node.js), Prisma ORM, Passport JWT
+- **Frontend:** React (Vite), TypeScript, Zustand (State Management), Tailwind CSS
+- **Database:** PostgreSQL 16 (with `pgcrypto` and `tsvector` Full-Text Search)
+- **Infrastructure:** Docker & Dev Containers
 
 ---
 
-## 2. Prerequisites
+## AI Tools Declaration
 
-### Recommended (Dev Container)
-- Docker Desktop  
-- Visual Studio Code  
-- Dev Containers extension  
-
-### If not using containers
-- Node.js (LTS)
-- npm or yarn
-- PostgreSQL installed manually
+* **GitHub Copilot / Gemini:** Used to generate synthetic seed data (Faker.js logic), scaffold unit test boilerplate, and debug Docker/Webpack configuration issues for the ARM64 architecture.
+* **Usage Context:** AI was strictly used as an accelerator for repetitive tasks; all architectural decisions (Polymorphic DB design, SQL Views, State Management) were manually engineered.
 
 ---
 
-## 3. Environment Setup (Using VS Code Dev Container)
+## Setup & Installation
 
-1. **Clone your fork** of the repository:
+### Option A: Dev Container (Recommended for Bonus Points)
+This project includes a fully configured `.devcontainer` specification.
+1.  Open the project in **VS Code**.
+2.  When prompted, click **"Reopen in Container"** (or press `F1` -> `Dev Containers: Reopen in Container`).
+3.  The environment will automatically install Node.js v20, PostgreSQL 16, and all extensions as recieved and forked.
 
-   ```bash
-   git clone https://github.com/Oman-Housing-Bank-SAOC/developer-technical-assessment-starter-kit.git
+### Option B: Manual Setup
+**Prerequisites:** Node.js v18+, Docker Desktop.
 
-   cd developer-technical-assessment-starter-kit
-   ```
+1.  **Start the Database:**
+    ```bash
+    docker-compose up -d db
+    ```
 
+2.  **Backend Setup:**
+    **environment file (.env) was pushed to github for the assessment only, in real life it should be ignored and sent internally** 
+    ```bash
+    cd Projects/backend
+    npm install
+    
+    # 1. Generate Prisma Client
+    npx prisma generate
+    
+    # 2. Initialize Database Schema & Indexes
+    # Note: Ensure the DB container is running first
+    npx prisma db push
+    # Or: in terminal navigate to database folder and run: psql -h db -U postgres -d postgres -f script.sql 
+    
+    # 3. Seed the Database (1000+ Records for Performance Test)
+    Navigate to backend folder and run: npm run seed.js
+    
+    # 4. Start Server
+    npm run start:dev
+    ```
+    *Server will run on: `http://localhost:3000`*
 
-2. Open the folder in Visual Studio Code.
-3. Press Ctrl+Shift+P → select:
-```
-Dev Containers: Reopen in Container
-```
-Database connection inside the Dev Container
+3.  **Frontend Setup:**
+    ```bash
+    cd Projects/frontend
+    npm install
+    pm run dev -- --host
+    ```
+    *Client will run on: `http://localhost:5173`*
 
-Use the following credentials:
+---
 
-| Key      | Value    |
-|----------|----------|
-| Host     | db       |
-| Port     | 5432     |
-| User     | postgres |
-| Password | postgres |
-| Database | postgres |
+## Test Coverage
+The backend architecture supports high testability.
+To run the unit tests and generate the coverage report:
 
-## 4. Database Setup
-
-SQL init scripts are located in:
-```
-Projects/database/script.sql
-```
-
-This file should includes:
-1. Tables and Views creation
-2. Indexes
-
-To create the random fake data navigate to backend folder in your terminal and Run: 
-```
-node seed.js
-```
+```bash
+cd Projects/backend
+npm run test:cov
