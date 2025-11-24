@@ -91,13 +91,18 @@ Use the following credentials:
 
 ## 4. Database Setup
 
-All SQL scripts have to be located in:
+SQL init scripts are located in:
 ```
 Projects/database/script.sql
 ```
 
 This file should includes:
-1. Table creation
+1. Tables and Views creation
 2. Indexes
-3. Sample seed data (projects, lands, properties, users, contacts.. etc) 
+
+before running the script, install postgres client
+apt-get update && apt-get install -y postgresql-client
+
+run the command below in database folder (Projects/database/) to setup the database
+psql -h db -U postgres -d postgres -f script.sql
 
