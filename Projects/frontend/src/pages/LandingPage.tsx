@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../lib/api';
 import { ListingCard } from '../components/ListingCard';
 import { useStore } from '../store/useStore';
@@ -15,11 +15,15 @@ interface ListingSummary {
 
 export const LandingPage = () => {
   const [listings, setListings] = useState<ListingSummary[]>([]);
+  const [featuredListings, setFeaturedListings] = useState<ListingSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
   const [searchTerm, setSearchTerm] = useState('');
   const { setSearchQuery } = useStore();
+  
+  // Carousel State
+  const [currentSlide, setCurrentSlide] = useState(0);
+  //const carouselRef = useRef<HTMLDivElement>(null);
 
   const fetchListings = async (query = '') => {
     setLoading(true);
@@ -31,6 +35,12 @@ export const LandingPage = () => {
         
       const { data } = await api.get<ListingSummary[]>(endpoint);
       setListings(data);
+      
+      // Logic to select "Featured" properties (e.g., first 5 from popular list)
+      // In a real app, this might be a separate API call like /listings/featured
+      if (!query) {
+        setFeaturedListings(data.slice(0, 5));
+      }
     } catch (err) {
       console.error(err);
       setError('Failed to load listings. Please try again.');
@@ -43,17 +53,34 @@ export const LandingPage = () => {
     fetchListings();
   }, []);
 
+  // Auto-scroll carousel
+  useEffect(() => {
+    if (featuredListings.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % featuredListings.length);
+    }, 5000); // Change slide every 5 seconds
+    return () => clearInterval(interval);
+  }, [featuredListings]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(searchTerm);
     fetchListings(searchTerm);
   };
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % featuredListings.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + featuredListings.length) % featuredListings.length);
+  };
+
   return (
-    <div className="pb-20">
+    <div className="pb-20 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors duration-300">
       {/* Hero Section */}
-      <section className="bg-ohb-gray dark:bg-slate-950 py-20 px-4 text-center border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <section className="bg-ohb-gray dark:bg-slate-950 py-16 px-4 text-center border-b border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
           <h1 className="text-4xl md:text-6xl font-extrabold text-ohb-dark dark:text-white tracking-tight transition-colors">
             Unlock Your <span className="text-ohb-gold">Dream Home</span>
           </h1>
@@ -80,6 +107,82 @@ export const LandingPage = () => {
           </form>
         </div>
       </section>
+
+      {/* Featured Carousel Section (Only shows on home page, not search results) */}
+      {!searchTerm && featuredListings.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <h2 className="text-2xl font-bold text-ohb-dark dark:text-white mb-6 border-l-4 border-ohb-gold pl-4 transition-colors">
+            Featured Properties
+          </h2>
+          
+          <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl group">
+            {/* Slides */}
+            <div 
+              className="absolute inset-0 flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {featuredListings.map((item) => (
+                <div key={item.id} className="min-w-full h-full relative">
+                  <img 
+                    src={item.image_urls[0] || 'https://via.placeholder.com/1200x600'} 
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <span className="bg-ohb-gold px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-2 inline-block">
+                      Featured {item.type}
+                    </span>
+                    <h3 className="text-3xl font-bold mb-2">{item.name}</h3>
+                    <p className="text-xl font-medium mb-4 opacity-90">{item.location}</p>
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl font-bold text-ohb-gold">
+                        {(!isNaN(Number(item.price))) ? `OMR ${Number(item.price).toLocaleString()}` : item.price}
+                      </span>
+                      <a 
+                        href={`/details/${item.type}/${item.id}`}
+                        className="bg-white text-ohb-dark px-6 py-2 rounded-lg font-bold hover:bg-ohb-gold hover:text-white transition-colors"
+                      >
+                        View Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            <button 
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition-all opacity-0 group-hover:opacity-100"
+            >
+              <ChevronLeft size={32} />
+            </button>
+            <button 
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md p-2 rounded-full text-white transition-all opacity-0 group-hover:opacity-100"
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            {/* Dots Indicators */}
+            <div className="absolute bottom-4 right-8 flex gap-2">
+              {featuredListings.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    idx === currentSlide ? 'bg-ohb-gold w-8' : 'bg-white/50 hover:bg-white'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Listings Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">

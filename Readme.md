@@ -78,3 +78,4 @@ npm run test:cov
 1- Dark Theme
 2- Map Page (Bottom Up Implementation of DB, Backend and Frontend)
 3- Inmemory caching for listings endpoints
+4- Price Chart in Details View
