@@ -77,7 +77,7 @@ npm run test:cov
 ---
 
 ## Implemented Extra Features
-1- Dark Theme
-2- Map Page (Bottom Up Implementation of DB, Backend and Frontend)
-3- Inmemory caching for listings endpoints
-4- Price Chart in Details View
+1. Dark Theme
+2. Map Page (Bottom Up Implementation of DB, Backend and Frontend)
+3. Inmemory caching for listings endpoints
+4. Price Chart in Details View
