@@ -73,6 +73,8 @@ To run the unit tests and generate the coverage report:
 ```bash
 cd Projects/backend
 npm run test:cov
+```
+---
 
 ## Implemented Extra Features
 1- Dark Theme
