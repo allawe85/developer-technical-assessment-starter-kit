@@ -1,11 +1,14 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, UseInterceptors } from '@nestjs/common';
 import { ListingsService } from './listings.service';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager'; 
 
 @Controller('listings')
 export class ListingsController {
   constructor(private readonly listingsService: ListingsService) {}
 
   // Endpoint: GET /listings/popular
+  @UseInterceptors(CacheInterceptor) 
+  @CacheTTL(60000) 
   @Get('popular')
   getPopular() {
     return this.listingsService.getPopular();
@@ -13,6 +16,8 @@ export class ListingsController {
 
   // ENDPOINT: GET /listings/map
   @Get('map')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300000)
   getMapListings() {
     return this.listingsService.getMapListings();
   }
